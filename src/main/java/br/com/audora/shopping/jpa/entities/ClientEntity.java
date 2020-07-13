@@ -11,7 +11,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "sellers")
-public class SellerEntity
+public class ClientEntity
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,11 +22,11 @@ public class SellerEntity
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "seller", orphanRemoval = true)
     private ProfileEntity profile;
 
-    public SellerEntity()
+    public ClientEntity()
     {
     }
 
-    public SellerEntity(String accountId)
+    public ClientEntity(String accountId)
     {
         this.accountId = accountId;
     }

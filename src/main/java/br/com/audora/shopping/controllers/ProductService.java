@@ -29,16 +29,16 @@ import javax.validation.Valid;
 
 import br.com.audora.shopping.jpa.entities.CategoryEntity;
 import br.com.audora.shopping.jpa.entities.ProductEntity;
-import br.com.audora.shopping.jpa.entities.SellerEntity;
+import br.com.audora.shopping.jpa.entities.ClientEntity;
 import br.com.audora.shopping.jpa.repositories.CategoryJpaRepository;
 import br.com.audora.shopping.jpa.repositories.ProductJpaRepository;
-import br.com.audora.shopping.jpa.repositories.SellerJpaRepository;
+import br.com.audora.shopping.jpa.repositories.ClientJpaRepository;
 import br.com.audora.shopping.mongodb.models.Category;
 import br.com.audora.shopping.mongodb.models.EmbeddedCategory;
 import br.com.audora.shopping.mongodb.models.Product;
-import br.com.audora.shopping.mongodb.models.Seller;
+import br.com.audora.shopping.mongodb.models.Client;
 import br.com.audora.shopping.mongodb.repositories.CategoryRepository;
-import br.com.audora.shopping.mongodb.repositories.SellerRepository;
+import br.com.audora.shopping.mongodb.repositories.ClientRepository;
 
 @RestController
 @RequestMapping(path = "/product")
@@ -48,13 +48,13 @@ public class ProductService
     @Autowired
     private ProductRepository _productMongoRepository;
     @Autowired
-    private SellerRepository _sellerMongoRepository;
+    private ClientRepository _sellerMongoRepository;
     @Autowired
     private CategoryRepository _categoryMongoRepository;
     @Autowired
     private ProductJpaRepository _productJpaRepository;
     @Autowired
-    private SellerJpaRepository _sellerJpaRepository;
+    private ClientJpaRepository _sellerJpaRepository;
     @Autowired
     private CategoryJpaRepository _categoryJpaRepository;
 
@@ -101,7 +101,7 @@ public class ProductService
     @PostMapping(path = "/mongo")
     public ResponseEntity<?> addNewProductInMongoDB(@Valid @RequestBody Product product)
     {
-        Seller seller;
+        Client seller;
         HashSet<EmbeddedCategory> categories = new HashSet<>();
         try
         {
@@ -152,7 +152,7 @@ public class ProductService
             return HttpStatus.BAD_REQUEST;
         }
 
-        SellerEntity seller;
+        ClientEntity seller;
         try
         {
             seller = _sellerJpaRepository.findById(product.getSeller().getId()).orElseThrow(EntityNotFoundException::new);
@@ -247,7 +247,7 @@ public class ProductService
     public ResponseEntity<String> updateProductInMysql(@Valid @RequestBody ProductEntity product)
     {
         ProductEntity productEntity;
-        SellerEntity sellerEntity;
+        ClientEntity sellerEntity;
         try
         {
             productEntity = _productJpaRepository.getOne(product.getId());

@@ -27,7 +27,7 @@ public class ProfileEntity
     @JoinColumn(nullable = false)
     @MapsId
     @JsonIgnore
-    private SellerEntity seller;
+    private ClientEntity seller;
 
     private String firstName;
 
@@ -49,7 +49,7 @@ public class ProfileEntity
     {
     }
 
-    public ProfileEntity(SellerEntity seller, String firstName, String lastName, Gender gender)
+    public ProfileEntity(ClientEntity seller, String firstName, String lastName, Gender gender)
     {
         this.seller = seller;
         this.firstName = firstName;
@@ -67,12 +67,12 @@ public class ProfileEntity
         this.id = id;
     }
 
-    public SellerEntity getSeller()
+    public ClientEntity getSeller()
     {
         return seller;
     }
 
-    public void setSeller(SellerEntity seller)
+    public void setSeller(ClientEntity seller)
     {
         this.seller = seller;
     }

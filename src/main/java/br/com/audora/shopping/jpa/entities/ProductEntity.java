@@ -41,10 +41,10 @@ public class ProductEntity
     @NotNull
     private List<String> images;
 
-    @ManyToOne(targetEntity = SellerEntity.class)
+    @ManyToOne(targetEntity = ClientEntity.class)
     @JoinColumn(name = "seller_id", referencedColumnName = "id", nullable = false)
     @NotNull
-    private SellerEntity seller;
+    private ClientEntity seller;
 
 
     @ManyToMany
@@ -61,7 +61,7 @@ public class ProductEntity
     {
     }
 
-    public ProductEntity(String name, String description, float price, List<String> images, SellerEntity seller, HashSet<CategoryEntity> fallIntoCategories)
+    public ProductEntity(String name, String description, float price, List<String> images, ClientEntity seller, HashSet<CategoryEntity> fallIntoCategories)
     {
         this.name = name;
         this.description = description;
@@ -121,12 +121,12 @@ public class ProductEntity
         this.images = images;
     }
 
-    public SellerEntity getSeller()
+    public ClientEntity getSeller()
     {
         return seller;
     }
 
-    public void setSeller(SellerEntity seller)
+    public void setSeller(ClientEntity seller)
     {
         this.seller = seller;
     }

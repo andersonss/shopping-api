@@ -26,18 +26,18 @@ import br.com.audora.shopping.enums.Gender;
 import br.com.audora.shopping.jpa.entities.CategoryEntity;
 import br.com.audora.shopping.jpa.entities.ProductEntity;
 import br.com.audora.shopping.jpa.entities.ProfileEntity;
-import br.com.audora.shopping.jpa.entities.SellerEntity;
+import br.com.audora.shopping.jpa.entities.ClientEntity;
 import br.com.audora.shopping.jpa.repositories.CategoryJpaRepository;
 import br.com.audora.shopping.jpa.repositories.ProductJpaRepository;
-import br.com.audora.shopping.jpa.repositories.SellerJpaRepository;
+import br.com.audora.shopping.jpa.repositories.ClientJpaRepository;
 import br.com.audora.shopping.mongodb.models.Category;
 import br.com.audora.shopping.mongodb.models.EmbeddedCategory;
 import br.com.audora.shopping.mongodb.models.Product;
 import br.com.audora.shopping.mongodb.models.Profile;
-import br.com.audora.shopping.mongodb.models.Seller;
+import br.com.audora.shopping.mongodb.models.Client;
 import br.com.audora.shopping.mongodb.repositories.CategoryRepository;
 import br.com.audora.shopping.mongodb.repositories.ProductRepository;
-import br.com.audora.shopping.mongodb.repositories.SellerRepository;
+import br.com.audora.shopping.mongodb.repositories.ClientRepository;
 
 
 @EnableJpaRepositories(basePackages = "br.com.audora.shopping.jpa.repositories")
@@ -50,14 +50,14 @@ public class Application implements CommandLineRunner
     @Autowired
     private ProductRepository _productMongoRepository;
     @Autowired
-    private SellerRepository _sellerMongoRepository;
+    private ClientRepository _clientMongoRepository;
 
     @Autowired
     private CategoryJpaRepository _categoryJpaRepository;
     @Autowired
     private ProductJpaRepository _productJpaRepository;
     @Autowired
-    private SellerJpaRepository _sellerJpaRepository;
+    private ClientJpaRepository _clientJpaRepository;
 
 
     public static void main(String[] args)
@@ -70,23 +70,23 @@ public class Application implements CommandLineRunner
     {
         _categoryJpaRepository.deleteAll();
         _productJpaRepository.deleteAll();
-        _sellerJpaRepository.deleteAll();
+        _clientJpaRepository.deleteAll();
         MongoOperations mongoOperation = new MongoTemplate(new MongoClient(), "local");
         _categoryMongoRepository.deleteAll();
-        _sellerMongoRepository.deleteAll();
+        _clientMongoRepository.deleteAll();
         _productMongoRepository.deleteAll();
 
 
         //--------------Create two sellers-----------------------------------------
-        SellerEntity judy = new SellerEntity("Judy's account id = 879");
+        ClientEntity judy = new ClientEntity("Judy's account id = 879");
         ProfileEntity judyProfile = new ProfileEntity(judy, "Judy", "Adams", Gender.Female);
         judyProfile.setBirthday(new SimpleDateFormat("MM/dd/yyyy").parse(("4/12/2010")));
         judy.setProfile(judyProfile);
-        judy = _sellerJpaRepository.save(judy);
-        SellerEntity michael = new SellerEntity("Micheal's account id = 023");
+        judy = _clientJpaRepository.save(judy);
+        ClientEntity michael = new ClientEntity("Micheal's account id = 023");
         ProfileEntity michaelProfile = new ProfileEntity(michael, "Michael", "Martin", Gender.Male);
         michael.setProfile(michaelProfile);
-        michael = _sellerJpaRepository.save(michael);
+        michael = _clientJpaRepository.save(michael);
 
 
         //--------------Create 4 different categories and save them--------------------
@@ -124,13 +124,13 @@ public class Application implements CommandLineRunner
 
         //--------------Create a seller-----------------------------------------------
         Profile profile = new Profile("Peter", "Smith", Gender.Male);
-        Seller seller = new Seller("Peter's account id = 391", profile);
-        _sellerMongoRepository.save(seller);
+        Client seller = new Client("Peter's account id = 391", profile);
+        _clientMongoRepository.save(seller);
 
         System.out.println("__________________________________________________________________");
         System.out.println("Test MongoDB repository");
         System.out.println("Find seller(s) by first name");
-        _sellerMongoRepository.findByFirstName("Peter").forEach(System.out::println);
+        _clientMongoRepository.findByFirstName("Peter").forEach(System.out::println);
         System.out.println("__________________________________________________________________");
 
 

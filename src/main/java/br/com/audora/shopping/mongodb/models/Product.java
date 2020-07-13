@@ -26,7 +26,7 @@ public class Product
     private List<String> image_URLs = new ArrayList<>();
 
     @DBRef
-    private Seller seller;
+    private Client seller;
 
     private Set<EmbeddedCategory> fallIntoCategories = new HashSet<>();
 
@@ -34,7 +34,7 @@ public class Product
     {
     }
 
-    public Product(String name, String description, float price, Seller seller, HashSet<EmbeddedCategory> fallIntoCategories)
+    public Product(String name, String description, float price, Client seller, HashSet<EmbeddedCategory> fallIntoCategories)
     {
         this.name = name;
         this.description = description;
@@ -93,12 +93,12 @@ public class Product
         this.image_URLs = image_URLs;
     }
 
-    public Seller getSeller()
+    public Client getSeller()
     {
         return seller;
     }
 
-    public void setSeller(Seller seller)
+    public void setSeller(Client seller)
     {
         this.seller = seller;
     }

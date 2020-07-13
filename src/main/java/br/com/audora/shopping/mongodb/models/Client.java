@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "sellers")
 @TypeAlias(value = "Seller")
-public class Seller
+public class Client
 {
     @Id
     private String id;
@@ -17,11 +17,11 @@ public class Seller
 
     private Profile profile;
 
-    public Seller()
+    public Client()
     {
     }
 
-    public Seller(String accountId, Profile profile)
+    public Client(String accountId, Profile profile)
     {
         this.accountId = accountId;
         this.profile = profile;
