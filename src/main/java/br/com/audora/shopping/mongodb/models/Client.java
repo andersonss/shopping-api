@@ -12,20 +12,10 @@ public class Client
     @Id
     private String id;
 
-    //TODO Remove this
-    private String accountId;
-
     private Profile profile;
 
     public Client()
     {
-    }
-
-    //TODO Remove this
-    public Client(String accountId, Profile profile)
-    {
-        this.accountId = accountId;
-        this.profile = profile;
     }
 
     public Client(Profile profile)
@@ -41,16 +31,6 @@ public class Client
     public void setId(String id)
     {
         this.id = id;
-    }
-
-    public String getAccountId()
-    {
-        return accountId;
-    }
-
-    public void setAccountId(String accountId)
-    {
-        this.accountId = accountId;
     }
 
     public Profile getProfile()

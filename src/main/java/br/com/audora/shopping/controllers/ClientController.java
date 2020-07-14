@@ -94,7 +94,6 @@ public class ClientController
         {
             Client clientInDatabase = clientMongoRepository.findById(client.getId()).orElseThrow(EntityNotFoundException::new);
             Update update = new Update();
-            update.set("accountId", client.getAccountId());
             update.set("profile.firstName", client.getProfile().getFirstName());
             update.set("profile.lastName", client.getProfile().getLastName());
             update.set("profile.website", client.getProfile().getWebsite());
