@@ -32,13 +32,18 @@ import br.com.audora.shopping.mongodb.repositories.CategoryRepository;
 @RequestMapping(path = "/category")
 public class CategoryController
 {
-    private MongoOperations mongoOperation = new MongoTemplate(new MongoClient(), "local");
+    final MongoOperations mongoOperation = new MongoTemplate(new MongoClient(), "local");
     @Autowired
     private CategoryRepository _categoryMongoRepository;
 
-    //----------Retrieve Categories-------------
+    /**
+     * Get categories by name
+     *
+     * @param name
+     * @return
+     */
     @GetMapping(path = "")
-    public ResponseEntity<Category> getCategoryFromMongoDB(@RequestParam(value = "name") String name)
+    public ResponseEntity<Category> getCategory(@RequestParam(value = "name") String name)
     {
         Category categoryMongo = _categoryMongoRepository.findByName(name);
         if (categoryMongo != null)
@@ -49,15 +54,23 @@ public class CategoryController
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * Lists all categories
+     * @return
+     */
     @GetMapping(path = "/all")
-    public List<Category> getAllCategoriesFromMongoDB()
+    public List<Category> getAllCategories()
     {
         return _categoryMongoRepository.findAll();
     }
 
-    //----------Create a Category---------------
+    /**
+     * Add new category
+     * @param category
+     * @return
+     */
     @PostMapping(path = "")
-    public ResponseEntity<Category> addNewCategoryInMongoDB(@Valid @RequestBody Category category)
+    public ResponseEntity<Category> addNewCategory(@Valid @RequestBody Category category)
     {
         if (category == null || category.getName() == null || category.getName().trim().isEmpty())
         {
@@ -67,11 +80,17 @@ public class CategoryController
         return new ResponseEntity<>(createdCategory, HttpStatus.OK);
     }
 
-    //----------Update a Category---------------
+    /**
+     * Updates a category
+     *
+     * @param category
+     * @return
+     */
     @PutMapping(path = "")
-    public ResponseEntity<String> updateCategoryInMongoDB(@Valid @RequestBody Category category)
+    public ResponseEntity<String> updateCategory(@Valid @RequestBody Category category)
     {
-        if (category == null || category.getId() == null || category.getName() == null || category.getName().trim().isEmpty())
+        if (category == null || category.getId() == null || category.getName() == null ||
+                category.getName().trim().isEmpty())
         {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

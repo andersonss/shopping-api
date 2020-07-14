@@ -38,19 +38,24 @@ import br.com.audora.shopping.mongodb.repositories.ClientRepository;
 @RequestMapping(path = "/product")
 public class ProductController
 {
-    private MongoOperations mongoOperations = new MongoTemplate(new MongoClient(), "local");
+    final MongoOperations mongoOperations = new MongoTemplate(new MongoClient(), "local");
     @Autowired
-    private ProductRepository _productMongoRepository;
+    private ProductRepository productMongoRepository;
     @Autowired
-    private ClientRepository _sellerMongoRepository;
+    private ClientRepository sellerMongoRepository;
     @Autowired
-    private CategoryRepository _categoryMongoRepository;
+    private CategoryRepository categoryMongoRepository;
 
-    //----------Retrieve Products----------------
+    /**
+     * Retrieve Products
+     *
+     * @param name
+     * @return
+     */
     @GetMapping(path = "")
-    public ResponseEntity<Product> getProductFromMongoDB(@RequestParam(value = "name") String name)
+    public ResponseEntity<Product> getProduct(@RequestParam(value = "name") String name)
     {
-        Product productMongo = _productMongoRepository.findByName(name);
+        Product productMongo = productMongoRepository.findByName(name);
         if (productMongo != null)
         {
             return new ResponseEntity<>(productMongo, HttpStatus.OK);
@@ -59,15 +64,25 @@ public class ProductController
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * List all products.
+     *
+     * @return
+     */
     @GetMapping(path = "/all")
     public List<Product> getAllProductsFromMongoDB()
     {
-        return _productMongoRepository.findAll();
+        return productMongoRepository.findAll();
     }
 
-    //----------Create a Product-----------------
+    /**
+     * Creates a Product
+     *
+     * @param product
+     * @return
+     */
     @PostMapping(path = "")
-    public ResponseEntity<?> addNewProductInMongoDB(@Valid @RequestBody Product product)
+    public ResponseEntity<?> addNewProduct(@Valid @RequestBody Product product)
     {
         Client seller;
         HashSet<EmbeddedCategory> categories = new HashSet<>();
@@ -75,7 +90,7 @@ public class ProductController
         {
             for (EmbeddedCategory embCat : product.getFallIntoCategories())
             {
-                Category category = _categoryMongoRepository.findById(embCat.getId()).orElseThrow(EntityNotFoundException::new);
+                Category category = categoryMongoRepository.findById(embCat.getId()).orElseThrow(EntityNotFoundException::new);
                 categories.add(new EmbeddedCategory(category.getId(), category.getName()));
             }
         }
@@ -89,14 +104,14 @@ public class ProductController
         }
         try
         {
-            seller = _sellerMongoRepository.findById(product.getSeller().getId()).orElseThrow(EntityNotFoundException::new);
+            seller = sellerMongoRepository.findById(product.getSeller().getId()).orElseThrow(EntityNotFoundException::new);
         }
         catch (EntityNotFoundException e)
         {
             return new ResponseEntity<>("The seller of this product doesn't exists in MongoDB!", HttpStatus.BAD_REQUEST);
         }
         Product productMongoDB = new Product(product.getName(), product.getDescription(), product.getPrice(), seller, categories);
-        productMongoDB = _productMongoRepository.save(productMongoDB);
+        productMongoDB = productMongoRepository.save(productMongoDB);
         //add a reference to this product in appropriate categories
         Update update = new Update();
         update.addToSet("productsOfCategory", productMongoDB.getId());
@@ -107,11 +122,16 @@ public class ProductController
         return new ResponseEntity<>(productMongoDB, HttpStatus.OK);
     }
 
-    //----------Update a Product-----------------
+    /**
+     * Updates a Product
+     *
+     * @param product
+     * @return
+     */
     @PutMapping(path = "")
-    public ResponseEntity<String> updateProductInMongoDB(@Valid @RequestBody Product product)
+    public ResponseEntity<String> updateProduct(@Valid @RequestBody Product product)
     {
-        Product productInDatabase = _productMongoRepository.findById(product.getId()).orElse(null);
+        Product productInDatabase = productMongoRepository.findById(product.getId()).orElse(null);
         if (productInDatabase == null)
         {
             return new ResponseEntity<>("This product doesn't exists in MongoDB.", HttpStatus.NOT_FOUND);
@@ -121,17 +141,20 @@ public class ProductController
         {
             for (EmbeddedCategory embCat : product.getFallIntoCategories())
             {
-                Category category = _categoryMongoRepository.findById(embCat.getId()).orElseThrow(EntityNotFoundException::new);
+                Category category = categoryMongoRepository.findById(embCat.getId())
+                        .orElseThrow(EntityNotFoundException::new);
                 categories.add(new EmbeddedCategory(category.getId(), category.getName()));
             }
         }
         catch (EntityNotFoundException e)
         {
-            return new ResponseEntity<>("One of the categories which the product falls into, doesn't exists!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("One of the categories which the product falls into, doesn't exists!",
+                    HttpStatus.BAD_REQUEST);
         }
         if (categories.isEmpty())
         {
-            return new ResponseEntity<>("The product must belongs to at least one category!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("The product must belongs to at least one category!",
+                    HttpStatus.BAD_REQUEST);
         }
         //Update the product by setting each property of this product in a update query.
         Update update = new Update();
@@ -144,7 +167,7 @@ public class ProductController
         UpdateResult updateResult = mongoOperations.updateFirst(query, update, Product.class);
         if (updateResult.getModifiedCount() == 1)
         {
-            productInDatabase = _productMongoRepository.findById(product.getId()).get();
+            productInDatabase = productMongoRepository.findById(product.getId()).get();
             System.out.println("The \"" + productInDatabase.getName() + "\" product updated!");
             return new ResponseEntity<>("The product updated", HttpStatus.OK);
         }

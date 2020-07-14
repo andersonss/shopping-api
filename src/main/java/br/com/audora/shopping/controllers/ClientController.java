@@ -32,14 +32,17 @@ import br.com.audora.shopping.mongodb.repositories.ClientRepository;
 @RequestMapping(path = "/client")
 public class ClientController
 {
-    private MongoOperations mongoOperation = new MongoTemplate(new MongoClient(), "local");
+    final MongoOperations mongoOperation = new MongoTemplate(new MongoClient(), "local");
     @Autowired
     private ClientRepository clientMongoRepository;
 
-
-    //----------Retrieve Clients----------------
+    /**
+     * Get a client by first name
+     * @param firstName
+     * @return
+     */
     @GetMapping(path = "")
-    public ResponseEntity<?> getClientsFromMongoDB(@RequestParam(value = "firstName") String firstName)
+    public ResponseEntity<?> getClientsByName(@RequestParam(value = "firstName") String firstName)
     {
         List<Client> clients = clientMongoRepository.findByFirstName(firstName);
         if (clients.size() > 0)
@@ -51,15 +54,25 @@ public class ClientController
         return new ResponseEntity<>("There isn't any seller with this name in MongoDB.", HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * Lists all clients
+     *
+     * @return
+     */
     @GetMapping(path = "/all")
-    public List<Client> getAllClientsFromMongoDB()
+    public List<Client> getAllClients()
     {
         return clientMongoRepository.findAll();
     }
 
-    //----------Create a Client-----------------
+    /**
+     * Creates a client
+     *
+     * @param client
+     * @return
+     */
     @PostMapping(path = "")
-    public ResponseEntity<Client> addNewClientInMongoDB(@Valid @RequestBody Client client)
+    public ResponseEntity<Client> addNewClient(@Valid @RequestBody Client client)
     {
         Profile profile = new Profile(client.getProfile().getFirstName(), client.getProfile().getLastName(),
                 client.getProfile().getGender());
@@ -68,7 +81,12 @@ public class ClientController
         return new ResponseEntity<>(clientMongoDB, HttpStatus.OK);
     }
 
-    //----------Update a Seller-----------------
+    /**
+     * Updates a client
+     *
+     * @param client
+     * @return
+     */
     @PutMapping(path = "")
     public ResponseEntity<String> updateClientInMongoDB(@Valid @RequestBody Client client)
     {
