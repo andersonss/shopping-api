@@ -24,8 +24,6 @@ import java.util.List;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
-import br.com.audora.shopping.jpa.entities.CategoryEntity;
-import br.com.audora.shopping.jpa.repositories.CategoryJpaRepository;
 import br.com.audora.shopping.mongodb.models.Category;
 import br.com.audora.shopping.mongodb.models.Product;
 import br.com.audora.shopping.mongodb.repositories.CategoryRepository;
@@ -37,12 +35,9 @@ public class CategoryService
     private MongoOperations mongoOperation = new MongoTemplate(new MongoClient(), "local");
     @Autowired
     private CategoryRepository _categoryMongoRepository;
-    @Autowired
-    private CategoryJpaRepository _categoryJpaRepository;
-
 
     //----------Retrieve Categories-------------
-    @GetMapping(path = "/mongo")
+    @GetMapping(path = "")
     public ResponseEntity<Category> getCategoryFromMongoDB(@RequestParam(value = "name") String name)
     {
         Category categoryMongo = _categoryMongoRepository.findByName(name);
@@ -54,34 +49,14 @@ public class CategoryService
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping(path = "/all/mongo")
+    @GetMapping(path = "/all")
     public List<Category> getAllCategoriesFromMongoDB()
     {
         return _categoryMongoRepository.findAll();
     }
 
-    @GetMapping(path = "/mysql")
-    public ResponseEntity<?> getCategoryFromMysql(@RequestParam(value = "name") String name)
-    {
-        List<CategoryEntity> categoryEntityList = _categoryJpaRepository.findAllByName(name);
-        if (!categoryEntityList.isEmpty())
-        {
-            return new ResponseEntity<>(categoryEntityList, HttpStatus.OK);
-        }
-        System.out.println("There isn't any Category in MySQL database with name: " + name);
-
-        return new ResponseEntity<>(new StringBuilder("There isn't any Category in MySQL database with name: ").append(name).toString(), HttpStatus.NOT_FOUND);
-    }
-
-    @GetMapping(path = "/all/mysql")
-    public List<CategoryEntity> getAllCategoriesFromMysql()
-    {
-        return _categoryJpaRepository.findAll();
-    }
-
-
     //----------Create a Category---------------
-    @PostMapping(path = "/mongo")
+    @PostMapping(path = "")
     public ResponseEntity<Category> addNewCategoryInMongoDB(@Valid @RequestBody Category category)
     {
         if (category == null || category.getName() == null || category.getName().trim().isEmpty())
@@ -92,22 +67,8 @@ public class CategoryService
         return new ResponseEntity<>(createdCategory, HttpStatus.OK);
     }
 
-    @PostMapping(path = "/mysql")
-    public Object addNewCategoryInMysql(@RequestParam(value = "name") String name)
-    {
-        if (name == null || name.trim().isEmpty())
-        {
-            return HttpStatus.BAD_REQUEST;
-        }
-        CategoryEntity createdCategoryEntity = new CategoryEntity(name.trim());
-        createdCategoryEntity = _categoryJpaRepository.save(createdCategoryEntity);
-        System.out.println("A new Category created in MySQL database with id: " + createdCategoryEntity.getId() + "  and name: " + createdCategoryEntity.getName());
-        return createdCategoryEntity;
-    }
-
-
     //----------Update a Category---------------
-    @PutMapping(path = "/mongo")
+    @PutMapping(path = "")
     public ResponseEntity<String> updateCategoryInMongoDB(@Valid @RequestBody Category category)
     {
         if (category == null || category.getId() == null || category.getName() == null || category.getName().trim().isEmpty())
@@ -137,26 +98,6 @@ public class CategoryService
         else
         {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @PutMapping(path = "/mysql")
-    public ResponseEntity<String> updateCategoryInMysql(@Valid @RequestBody CategoryEntity category)
-    {
-        if (category == null)
-        {
-            return new ResponseEntity<>("Your request is null!", HttpStatus.BAD_REQUEST);
-        }
-        try
-        {
-            CategoryEntity categoryEntity = _categoryJpaRepository.findById(category.getId()).orElseThrow(EntityNotFoundException::new);
-            categoryEntity.setName(category.getName());
-            _categoryJpaRepository.save(categoryEntity);
-            return new ResponseEntity<>("The category updated", HttpStatus.OK);
-        }
-        catch (EntityNotFoundException e)
-        {
-            return new ResponseEntity<>("This category does not exists", HttpStatus.NOT_FOUND);
         }
     }
 }

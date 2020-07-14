@@ -27,12 +27,6 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
-import br.com.audora.shopping.jpa.entities.CategoryEntity;
-import br.com.audora.shopping.jpa.entities.ProductEntity;
-import br.com.audora.shopping.jpa.entities.ClientEntity;
-import br.com.audora.shopping.jpa.repositories.CategoryJpaRepository;
-import br.com.audora.shopping.jpa.repositories.ProductJpaRepository;
-import br.com.audora.shopping.jpa.repositories.ClientJpaRepository;
 import br.com.audora.shopping.mongodb.models.Category;
 import br.com.audora.shopping.mongodb.models.EmbeddedCategory;
 import br.com.audora.shopping.mongodb.models.Product;
@@ -51,16 +45,9 @@ public class ProductService
     private ClientRepository _sellerMongoRepository;
     @Autowired
     private CategoryRepository _categoryMongoRepository;
-    @Autowired
-    private ProductJpaRepository _productJpaRepository;
-    @Autowired
-    private ClientJpaRepository _sellerJpaRepository;
-    @Autowired
-    private CategoryJpaRepository _categoryJpaRepository;
-
 
     //----------Retrieve Products----------------
-    @GetMapping(path = "/mongo")
+    @GetMapping(path = "")
     public ResponseEntity<Product> getProductFromMongoDB(@RequestParam(value = "name") String name)
     {
         Product productMongo = _productMongoRepository.findByName(name);
@@ -72,33 +59,14 @@ public class ProductService
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping(path = "/mysql")
-    public ResponseEntity<ProductEntity> getProductFromMysql(@RequestParam(value = "name") String name)
-    {
-        ProductEntity product = _productJpaRepository.findByName(name);
-        if (product != null)
-        {
-            return new ResponseEntity<>(product, HttpStatus.OK);
-        }
-        System.out.println("There isn't any Product in MySQL database with name: " + name);
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    @GetMapping(path = "/all/mongo")
+    @GetMapping(path = "/all")
     public List<Product> getAllProductsFromMongoDB()
     {
         return _productMongoRepository.findAll();
     }
 
-    @GetMapping(path = "/all/mysql")
-    public List<ProductEntity> getAllProductsFromMysql()
-    {
-        return _productJpaRepository.findAll();
-    }
-
-
     //----------Create a Product-----------------
-    @PostMapping(path = "/mongo")
+    @PostMapping(path = "")
     public ResponseEntity<?> addNewProductInMongoDB(@Valid @RequestBody Product product)
     {
         Client seller;
@@ -139,63 +107,8 @@ public class ProductService
         return new ResponseEntity<>(productMongoDB, HttpStatus.OK);
     }
 
-    @PostMapping(path = "/mysql")
-    public Object addNewProductInMysql(@RequestBody ProductEntity product)
-    {
-        //Check the constraints
-        if (product.getName() == null || product.getName().trim().isEmpty())
-        {
-            return HttpStatus.BAD_REQUEST;
-        }
-        if (product.getImages() == null || product.getImages().size() == 0)
-        {
-            return HttpStatus.BAD_REQUEST;
-        }
-
-        ClientEntity seller;
-        try
-        {
-            seller = _sellerJpaRepository.findById(product.getSeller().getId()).orElseThrow(EntityNotFoundException::new);
-        }
-        catch (EntityNotFoundException e)
-        {
-            return HttpStatus.BAD_REQUEST;
-        }
-
-        HashSet<CategoryEntity> categories = new HashSet<>();
-        try
-        {
-            for (CategoryEntity categoryEntity : product.getFallIntoCategories())
-            {
-                categories.add(_categoryJpaRepository.findById(categoryEntity.getId()).orElseThrow(EntityNotFoundException::new));
-            }
-        }
-        catch (EntityNotFoundException e)
-        {
-            return HttpStatus.BAD_REQUEST;
-        }
-
-        if (!categories.isEmpty())
-        {
-            ProductEntity createdProductEntity = new ProductEntity(product.getName(),
-                    product.getDescription(),
-                    product.getPrice(),
-                    product.getImages(),
-                    seller,
-                    categories);
-            createdProductEntity = _productJpaRepository.save(createdProductEntity);
-            System.out.println("A new Product created in MySQL database with id: " + createdProductEntity.getId() + "  and name: " + createdProductEntity.getName());
-            return createdProductEntity;
-        }
-        else
-        {
-            return HttpStatus.BAD_REQUEST;
-        }
-    }
-
-
     //----------Update a Product-----------------
-    @PutMapping(path = "/mongo")
+    @PutMapping(path = "")
     public ResponseEntity<String> updateProductInMongoDB(@Valid @RequestBody Product product)
     {
         Product productInDatabase = _productMongoRepository.findById(product.getId()).orElse(null);
@@ -238,53 +151,6 @@ public class ProductService
         else
         {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-
-    }
-
-    @PutMapping(path = "/mysql")
-    public ResponseEntity<String> updateProductInMysql(@Valid @RequestBody ProductEntity product)
-    {
-        ProductEntity productEntity;
-        ClientEntity sellerEntity;
-        try
-        {
-            productEntity = _productJpaRepository.getOne(product.getId());
-            System.out.println("The product " + productEntity.getName() + " with id " + productEntity.getId() + " is updating...");
-        }
-        catch (EntityNotFoundException e)
-        {
-            return new ResponseEntity<>("This product does not exists in MySQL database.", HttpStatus.NOT_FOUND);
-        }
-        try
-        {
-            sellerEntity = _sellerJpaRepository.getOne(product.getSeller().getId());
-            System.out.println("The seller of this product is: " + sellerEntity.toString());
-        }
-        catch (EntityNotFoundException e)
-        {
-            return new ResponseEntity<>("The seller does not exists", HttpStatus.NOT_FOUND);
-        }
-        HashSet<CategoryEntity> categories = new HashSet<>();
-        for (CategoryEntity categoryEntity : product.getFallIntoCategories())
-        {
-            _categoryJpaRepository.findById(categoryEntity.getId()).ifPresent(categories::add);
-        }
-        if (!categories.isEmpty())
-        {
-            productEntity.setName(product.getName());
-            productEntity.setDescription(product.getDescription());
-            productEntity.setPrice(product.getPrice());
-            productEntity.setImages(product.getImages());
-            productEntity.setSeller(sellerEntity);
-            productEntity.setFallIntoCategories(categories);
-            _productJpaRepository.save(productEntity);
-            return new ResponseEntity<>("The product updated", HttpStatus.OK);
-        }
-        else
-        {
-            return new ResponseEntity<>("The product must belongs to at least one category!", HttpStatus.BAD_REQUEST);
         }
     }
 }

@@ -24,9 +24,6 @@ import java.util.List;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
-import br.com.audora.shopping.jpa.entities.ProfileEntity;
-import br.com.audora.shopping.jpa.entities.ClientEntity;
-import br.com.audora.shopping.jpa.repositories.ClientJpaRepository;
 import br.com.audora.shopping.mongodb.models.Profile;
 import br.com.audora.shopping.mongodb.models.Client;
 import br.com.audora.shopping.mongodb.repositories.ClientRepository;
@@ -37,13 +34,11 @@ public class ClientService
 {
     private MongoOperations _mongoOperation = new MongoTemplate(new MongoClient(), "local");
     @Autowired
-    private ClientJpaRepository _clientJpaRepository;
-    @Autowired
     private ClientRepository _clientMongoRepository;
 
 
     //----------Retrieve Clients----------------
-    @GetMapping(path = "/mongo")
+    @GetMapping(path = "")
     public ResponseEntity<?> getClientsFromMongoDB(@RequestParam(value = "firstName") String firstName)
     {
         List<Client> clients = _clientMongoRepository.findByFirstName(firstName);
@@ -55,36 +50,14 @@ public class ClientService
         return new ResponseEntity<>("There isn't any seller with this name in MongoDB.", HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping(path = "/all/mongo")
+    @GetMapping(path = "/all")
     public List<Client> getAllClientsFromMongoDB()
     {
         return _clientMongoRepository.findAll();
     }
 
-    @GetMapping(path = "/mysql")
-    public ResponseEntity<?> getClientFromMysql(@RequestParam(value = "id") long id)
-    {
-        try
-        {
-            ClientEntity client = _clientJpaRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-            System.out.println("The seller with id " + id + " = " + client.toString());
-            return new ResponseEntity<>(client, HttpStatus.OK);
-        }
-        catch (EntityNotFoundException e)
-        {
-            return new ResponseEntity<>("There isn't any seller with this name in MySQL.", HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @GetMapping(path = "/all/mysql")
-    public List<ClientEntity> getAllSellersFromMysql()
-    {
-        return _clientJpaRepository.findAll();
-    }
-
-
     //----------Create a Client-----------------
-    @PostMapping(path = "/mongo")
+    @PostMapping(path = "")
     public ResponseEntity<Client> addNewClientInMongoDB(@Valid @RequestBody Client client)
     {
         Profile profile = new Profile(client.getProfile().getFirstName(), client.getProfile().getLastName(),
@@ -94,24 +67,8 @@ public class ClientService
         return new ResponseEntity<>(clientMongoDB, HttpStatus.OK);
     }
 
-    @PostMapping(path = "/mysql")
-    public ResponseEntity<ClientEntity> addNewClientInMysql(@Valid @RequestBody ClientEntity client)
-    {
-        ClientEntity clientEntity = new ClientEntity(client.getAccountId());
-        ProfileEntity profile = new ProfileEntity(clientEntity, client.getProfile().getFirstName(),
-                client.getProfile().getLastName(), client.getProfile().getGender());
-        clientEntity.setProfile(profile);
-        clientEntity.getProfile().setWebsite(client.getProfile().getWebsite());
-        clientEntity.getProfile().setAddress(client.getProfile().getAddress());
-        clientEntity.getProfile().setEmailAddress(client.getProfile().getEmailAddress());
-        clientEntity.getProfile().setBirthday(client.getProfile().getBirthday());
-        clientEntity = _clientJpaRepository.save(clientEntity);
-        return new ResponseEntity<>(clientEntity, HttpStatus.OK);
-    }
-
-
     //----------Update a Seller-----------------
-    @PutMapping(path = "/mongo")
+    @PutMapping(path = "")
     public ResponseEntity<String> updateClientInMongoDB(@Valid @RequestBody Client client)
     {
         try
@@ -146,27 +103,5 @@ public class ClientService
             return new ResponseEntity<>("This seller doesn't exists in MongoDB.", HttpStatus.NOT_FOUND);
         }
 
-    }
-
-    @PutMapping(path = "/mysql")
-    public ResponseEntity<String> updateClientInMysql(@Valid @RequestBody ClientEntity client)
-    {
-        ClientEntity sellerEntity = _clientJpaRepository.findById(client.getId()).orElse(null);
-        if (sellerEntity == null)
-        {
-            return new ResponseEntity<>("This client doesn't exists in MySQL.", HttpStatus.NOT_FOUND);
-        }
-        sellerEntity.setAccountId(client.getAccountId());
-        sellerEntity.getProfile().setFirstName(client.getProfile().getFirstName());
-        sellerEntity.getProfile().setLastName(client.getProfile().getLastName());
-        sellerEntity.getProfile().setWebsite(client.getProfile().getWebsite());
-        sellerEntity.getProfile().setBirthday(client.getProfile().getBirthday());
-        sellerEntity.getProfile().setAddress(client.getProfile().getAddress());
-        sellerEntity.getProfile().setEmailAddress(client.getProfile().getEmailAddress());
-        sellerEntity.getProfile().setGender(client.getProfile().getGender());
-        sellerEntity = _clientJpaRepository.save(sellerEntity);
-        System.out.println("__________________________________________________________________");
-        System.out.println("The row of " + sellerEntity.toString() + " updated");
-        return new ResponseEntity<>("The seller updated", HttpStatus.OK);
     }
 }
