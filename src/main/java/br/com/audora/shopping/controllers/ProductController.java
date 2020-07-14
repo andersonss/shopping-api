@@ -90,32 +90,29 @@ public class ProductController
         {
             for (EmbeddedCategory embCat : product.getFallIntoCategories())
             {
-                Category category = categoryMongoRepository.findById(embCat.getId()).orElseThrow(EntityNotFoundException::new);
+                Category category = categoryMongoRepository.findById(embCat.getId())
+                        .orElseThrow(EntityNotFoundException::new);
                 categories.add(new EmbeddedCategory(category.getId(), category.getName()));
             }
         }
         catch (EntityNotFoundException e)
         {
-            return new ResponseEntity<>("One of the categories which the product falls into, doesn't exists!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("One of the categories which the product falls into, doesn't exists!",
+                    HttpStatus.BAD_REQUEST);
         }
         if (categories.isEmpty())
         {
-            return new ResponseEntity<>("The product must belongs to at least one category!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("The product must belongs to at least one category!",
+                    HttpStatus.BAD_REQUEST);
         }
-        try
-        {
-            seller = sellerMongoRepository.findById(product.getSeller().getId()).orElseThrow(EntityNotFoundException::new);
-        }
-        catch (EntityNotFoundException e)
-        {
-            return new ResponseEntity<>("The seller of this product doesn't exists in MongoDB!", HttpStatus.BAD_REQUEST);
-        }
-        Product productMongoDB = new Product(product.getName(), product.getDescription(), product.getPrice(), seller, categories);
+        Product productMongoDB = new Product(product.getName(), product.getDescription(), product.getPrice(),
+                categories);
         productMongoDB = productMongoRepository.save(productMongoDB);
         //add a reference to this product in appropriate categories
         Update update = new Update();
         update.addToSet("productsOfCategory", productMongoDB.getId());
-        List<String> catIds = productMongoDB.getFallIntoCategories().stream().map(EmbeddedCategory::getId).collect(Collectors.toList());
+        List<String> catIds = productMongoDB.getFallIntoCategories().stream().map(EmbeddedCategory::getId)
+                .collect(Collectors.toList());
         Query query = new Query().addCriteria(Criteria.where("_id").in(catIds));
         UpdateResult updateResult = mongoOperations.updateMulti(query, update, Category.class);
         System.out.println("The new product added and " + updateResult.getModifiedCount() + " categories updated.");

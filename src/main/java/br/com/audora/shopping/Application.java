@@ -81,7 +81,7 @@ public class Application implements CommandLineRunner
         EmbeddedCategory woodEmbedded = new EmbeddedCategory(woodCategory.getId(), woodCategory.getName());
         EmbeddedCategory handmadeEmbedded = new EmbeddedCategory(handmadeCategory.getId(), handmadeCategory.getName());
         HashSet<EmbeddedCategory> categoryList = new HashSet<>(Arrays.asList(woodEmbedded, handmadeEmbedded));
-        Product desk = new Product("A Wooden Desk", "Made with thick solid reclaimed wood, Easy to Assemble", 249.99f, client, categoryList);
+        Product desk = new Product("A Wooden Desk", "Made with thick solid reclaimed wood, Easy to Assemble", 249.99f, categoryList);
         desk = productMongoRepository.save(desk);
 
         Update update = new Update();
@@ -91,7 +91,8 @@ public class Application implements CommandLineRunner
         myUpdateQuery.addCriteria(Criteria.where("_id").in(ids));
         UpdateResult updateResult = mongoOperation.updateMulti(myUpdateQuery, update, Category.class);
         System.out.println("__________________________________________________________________");
-        System.out.println("The count of categories which updated after saving the desk is:  " + String.valueOf(updateResult.getMatchedCount()));
+        System.out.println("The count of categories which updated after saving the desk is:  "
+                + String.valueOf(updateResult.getMatchedCount()));
 
 
         //--------------Create a product in one category------------------------------
@@ -99,7 +100,7 @@ public class Application implements CommandLineRunner
         categoryList = new HashSet<>(Arrays.asList(furnitureEmbedded));
         Product diningChair = new Product("Antique Dining Chair",
                 "This mid-century fashionable chair is quite comfortable and attractive.", 234.20f,
-                client, categoryList);
+                categoryList);
         diningChair = productMongoRepository.save(diningChair);
 
         update = new Update();
@@ -117,7 +118,7 @@ public class Application implements CommandLineRunner
         EmbeddedCategory kitchenEmbedded = new EmbeddedCategory(kitchenCategory.getId(), kitchenCategory.getName());
         categoryList = new HashSet<>(Arrays.asList(handmadeEmbedded, woodEmbedded, kitchenEmbedded));
         Product spoon = new Product("Bamboo Spoon", "This is more durable than traditional hardwood " +
-                "spoon, safe to use any cookware.", 13.11f, client, categoryList);
+                "spoon, safe to use any cookware.", 13.11f, categoryList);
         spoon = productMongoRepository.save(spoon);
 
         update = new Update();

@@ -5,8 +5,8 @@ import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "sellers")
-@TypeAlias(value = "Seller")
+@Document(collection = "clients")
+@TypeAlias(value = "Client")
 public class Client
 {
     @Id

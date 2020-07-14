@@ -23,23 +23,26 @@ public class Product
 
     private float price;
 
-    private List<String> image_URLs = new ArrayList<>();
+    private List<String> image_URLs;
 
+    /*
     @DBRef
-    private Client seller;
+    private Client client;
+     */
 
-    private Set<EmbeddedCategory> fallIntoCategories = new HashSet<>();
+    private Set<EmbeddedCategory> fallIntoCategories;
 
-    public Product()
-    {
+    public Product() {
+        image_URLs = new ArrayList<>();
+        fallIntoCategories = new HashSet<>();
     }
 
-    public Product(String name, String description, float price, Client seller, HashSet<EmbeddedCategory> fallIntoCategories)
+    public Product(String name, String description, float price, HashSet<EmbeddedCategory> fallIntoCategories)
     {
+        this();
         this.name = name;
         this.description = description;
         this.price = price;
-        this.seller = seller;
         this.fallIntoCategories = fallIntoCategories;
     }
 
@@ -91,16 +94,6 @@ public class Product
     public void setImage_URLs(List<String> image_URLs)
     {
         this.image_URLs = image_URLs;
-    }
-
-    public Client getSeller()
-    {
-        return seller;
-    }
-
-    public void setSeller(Client seller)
-    {
-        this.seller = seller;
     }
 
     public Set<EmbeddedCategory> getFallIntoCategories()
