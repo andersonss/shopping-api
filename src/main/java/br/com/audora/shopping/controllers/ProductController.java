@@ -36,7 +36,7 @@ import br.com.audora.shopping.mongodb.repositories.ClientRepository;
 
 @RestController
 @RequestMapping(path = "/product")
-public class ProductService
+public class ProductController
 {
     private MongoOperations mongoOperations = new MongoTemplate(new MongoClient(), "local");
     @Autowired

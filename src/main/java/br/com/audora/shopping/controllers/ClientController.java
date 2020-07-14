@@ -30,18 +30,18 @@ import br.com.audora.shopping.mongodb.repositories.ClientRepository;
 
 @RestController
 @RequestMapping(path = "/client")
-public class ClientService
+public class ClientController
 {
-    private MongoOperations _mongoOperation = new MongoTemplate(new MongoClient(), "local");
+    private MongoOperations mongoOperation = new MongoTemplate(new MongoClient(), "local");
     @Autowired
-    private ClientRepository _clientMongoRepository;
+    private ClientRepository clientMongoRepository;
 
 
     //----------Retrieve Clients----------------
     @GetMapping(path = "")
     public ResponseEntity<?> getClientsFromMongoDB(@RequestParam(value = "firstName") String firstName)
     {
-        List<Client> clients = _clientMongoRepository.findByFirstName(firstName);
+        List<Client> clients = clientMongoRepository.findByFirstName(firstName);
         if (clients.size() > 0)
         {
             System.out.println("There are " + clients.size() + " sellers with first name " + firstName +
@@ -54,7 +54,7 @@ public class ClientService
     @GetMapping(path = "/all")
     public List<Client> getAllClientsFromMongoDB()
     {
-        return _clientMongoRepository.findAll();
+        return clientMongoRepository.findAll();
     }
 
     //----------Create a Client-----------------
@@ -63,8 +63,8 @@ public class ClientService
     {
         Profile profile = new Profile(client.getProfile().getFirstName(), client.getProfile().getLastName(),
                 client.getProfile().getGender());
-        Client clientMongoDB = new Client(client.getAccountId(), profile);
-        clientMongoDB = _clientMongoRepository.save(clientMongoDB);
+        Client clientMongoDB = new Client(profile);
+        clientMongoDB = clientMongoRepository.save(clientMongoDB);
         return new ResponseEntity<>(clientMongoDB, HttpStatus.OK);
     }
 
@@ -74,7 +74,7 @@ public class ClientService
     {
         try
         {
-            Client clientInDatabase = _clientMongoRepository.findById(client.getId()).orElseThrow(EntityNotFoundException::new);
+            Client clientInDatabase = clientMongoRepository.findById(client.getId()).orElseThrow(EntityNotFoundException::new);
             Update update = new Update();
             update.set("accountId", client.getAccountId());
             update.set("profile.firstName", client.getProfile().getFirstName());
@@ -86,10 +86,10 @@ public class ClientService
             update.set("profile.gender", client.getProfile().getGender());
 
             Query query = new Query(Criteria.where("_id").is(client.getId()));
-            UpdateResult updateResult = _mongoOperation.updateFirst(query, update, Client.class);
+            UpdateResult updateResult = mongoOperation.updateFirst(query, update, Client.class);
             if (updateResult.getModifiedCount() == 1)
             {
-                clientInDatabase = _clientMongoRepository.findById(client.getId()).orElseThrow(EntityNotFoundException::new);
+                clientInDatabase = clientMongoRepository.findById(client.getId()).orElseThrow(EntityNotFoundException::new);
                 System.out.println("__________________________________________________________________");
                 System.out.println("The document of " + clientInDatabase.toString() + " updated");
                 return new ResponseEntity<>("The seller updated", HttpStatus.OK);

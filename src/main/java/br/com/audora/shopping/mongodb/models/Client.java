@@ -12,7 +12,7 @@ public class Client
     @Id
     private String id;
 
-    @Indexed(unique = true)
+    //TODO Remove this
     private String accountId;
 
     private Profile profile;
@@ -21,9 +21,15 @@ public class Client
     {
     }
 
+    //TODO Remove this
     public Client(String accountId, Profile profile)
     {
         this.accountId = accountId;
+        this.profile = profile;
+    }
+
+    public Client(Profile profile)
+    {
         this.profile = profile;
     }
 

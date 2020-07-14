@@ -30,7 +30,7 @@ import br.com.audora.shopping.mongodb.repositories.CategoryRepository;
 
 @RestController
 @RequestMapping(path = "/category")
-public class CategoryService
+public class CategoryController
 {
     private MongoOperations mongoOperation = new MongoTemplate(new MongoClient(), "local");
     @Autowired

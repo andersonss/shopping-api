@@ -54,14 +54,14 @@ public class Application implements CommandLineRunner
         productMongoRepository.deleteAll();
 
         //--------------Create a client-----------------------------------------------
-        Profile profile = new Profile("Peter", "Smith", Gender.Male);
-        Client client = new Client("Peter's account id = 391", profile);
+        Profile profile = new Profile("Anderson", "Silva", Gender.Male);
+        Client client = new Client(profile);
         clientMongoRepository.save(client);
 
         System.out.println("__________________________________________________________________");
         System.out.println("Test MongoDB repository");
         System.out.println("Find client(s) by first name");
-        clientMongoRepository.findByFirstName("Peter").forEach(System.out::println);
+        clientMongoRepository.findByFirstName("Anderson").forEach(System.out::println);
         System.out.println("__________________________________________________________________");
 
 
