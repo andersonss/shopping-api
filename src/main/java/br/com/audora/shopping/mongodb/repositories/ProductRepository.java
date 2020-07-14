@@ -8,7 +8,6 @@ import br.com.audora.shopping.mongodb.models.Product;
 
 public interface ProductRepository extends MongoRepository<Product, String>
 {
-
     Product findByName(String name);
 
     @Override

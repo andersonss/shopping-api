@@ -44,7 +44,8 @@ public class ClientService
         List<Client> clients = _clientMongoRepository.findByFirstName(firstName);
         if (clients.size() > 0)
         {
-            System.out.println("There are " + clients.size() + " sellers with first name " + firstName + " in MongoDB database.");
+            System.out.println("There are " + clients.size() + " sellers with first name " + firstName +
+                    " in MongoDB database.");
             return new ResponseEntity<>(clients, HttpStatus.OK);
         }
         return new ResponseEntity<>("There isn't any seller with this name in MongoDB.", HttpStatus.NOT_FOUND);
