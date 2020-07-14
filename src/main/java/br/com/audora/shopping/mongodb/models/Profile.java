@@ -21,6 +21,8 @@ public class Profile
 
     private String emailAddress;
 
+    private String password;
+
     private Gender gender;
 
     public Profile()
@@ -102,5 +104,13 @@ public class Profile
     public void setGender(Gender gender)
     {
         this.gender = gender;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

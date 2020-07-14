@@ -14,8 +14,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -36,11 +34,11 @@ import br.com.audora.shopping.mongodb.repositories.ClientRepository;
 public class Application implements CommandLineRunner
 {
     @Autowired
-    private CategoryRepository _categoryMongoRepository;
+    private CategoryRepository categoryMongoRepository;
     @Autowired
-    private ProductRepository _productMongoRepository;
+    private ProductRepository productMongoRepository;
     @Autowired
-    private ClientRepository _clientMongoRepository;
+    private ClientRepository clientMongoRepository;
 
     public static void main(String[] args)
     {
@@ -51,32 +49,32 @@ public class Application implements CommandLineRunner
     public void run(String... strings) throws Exception
     {
         MongoOperations mongoOperation = new MongoTemplate(new MongoClient(), "local");
-        _categoryMongoRepository.deleteAll();
-        _clientMongoRepository.deleteAll();
-        _productMongoRepository.deleteAll();
+        categoryMongoRepository.deleteAll();
+        clientMongoRepository.deleteAll();
+        productMongoRepository.deleteAll();
 
         //--------------Create a client-----------------------------------------------
         Profile profile = new Profile("Peter", "Smith", Gender.Male);
         Client client = new Client("Peter's account id = 391", profile);
-        _clientMongoRepository.save(client);
+        clientMongoRepository.save(client);
 
         System.out.println("__________________________________________________________________");
         System.out.println("Test MongoDB repository");
-        System.out.println("Find seller(s) by first name");
-        _clientMongoRepository.findByFirstName("Peter").forEach(System.out::println);
+        System.out.println("Find client(s) by first name");
+        clientMongoRepository.findByFirstName("Peter").forEach(System.out::println);
         System.out.println("__________________________________________________________________");
 
 
         //--------------Create four different categories in MongoDB-------------------
         Category furnitureCategory = new Category("Furniture");
         Category handmadeCategory = new Category("Handmade");
-        furnitureCategory = _categoryMongoRepository.save(furnitureCategory);
-        handmadeCategory = _categoryMongoRepository.save(handmadeCategory);
+        furnitureCategory = categoryMongoRepository.save(furnitureCategory);
+        handmadeCategory = categoryMongoRepository.save(handmadeCategory);
         Category kitchenCategory = new Category("Kitchen");
-        kitchenCategory = _categoryMongoRepository.save(kitchenCategory);
+        kitchenCategory = categoryMongoRepository.save(kitchenCategory);
         Category woodCategory = new Category();
         woodCategory.setName("Wood");
-        woodCategory = _categoryMongoRepository.save(woodCategory);
+        woodCategory = categoryMongoRepository.save(woodCategory);
 
 
         //--------------Create a product in two different categories------------------
@@ -84,7 +82,7 @@ public class Application implements CommandLineRunner
         EmbeddedCategory handmadeEmbedded = new EmbeddedCategory(handmadeCategory.getId(), handmadeCategory.getName());
         HashSet<EmbeddedCategory> categoryList = new HashSet<>(Arrays.asList(woodEmbedded, handmadeEmbedded));
         Product desk = new Product("A Wooden Desk", "Made with thick solid reclaimed wood, Easy to Assemble", 249.99f, client, categoryList);
-        desk = _productMongoRepository.save(desk);
+        desk = productMongoRepository.save(desk);
 
         Update update = new Update();
         update.addToSet("productsOfCategory", desk.getId());
@@ -102,7 +100,7 @@ public class Application implements CommandLineRunner
         Product diningChair = new Product("Antique Dining Chair",
                 "This mid-century fashionable chair is quite comfortable and attractive.", 234.20f,
                 client, categoryList);
-        diningChair = _productMongoRepository.save(diningChair);
+        diningChair = productMongoRepository.save(diningChair);
 
         update = new Update();
         update.addToSet("productsOfCategory", diningChair.getId());
@@ -120,7 +118,7 @@ public class Application implements CommandLineRunner
         categoryList = new HashSet<>(Arrays.asList(handmadeEmbedded, woodEmbedded, kitchenEmbedded));
         Product spoon = new Product("Bamboo Spoon", "This is more durable than traditional hardwood " +
                 "spoon, safe to use any cookware.", 13.11f, client, categoryList);
-        spoon = _productMongoRepository.save(spoon);
+        spoon = productMongoRepository.save(spoon);
 
         update = new Update();
         update.addToSet("productsOfCategory", spoon.getId());
