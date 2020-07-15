@@ -44,17 +44,16 @@ public class ClientController
      * @return
      */
     @GetMapping(path = "")
-    public ResponseEntity<?> getClientsByFirstName(@RequestParam(value = "firstName") String firstName)
+    public ResponseEntity<Client> getClientByFirstName(@RequestParam(value = "firstName") String firstName)
     {
         List<Client> clients = clientMongoRepository.findByFirstName(firstName);
         if (clients.size() > 0)
         {
             System.out.println("There are " + clients.size() + " clients with first name " + firstName +
                     " in the database.");
-            return new ResponseEntity<>(clients, HttpStatus.OK);
+            return new ResponseEntity<>(clients.get(0), HttpStatus.OK);
         }
-        return new ResponseEntity<>("There isn't any client with this name in the database.",
-                HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -127,18 +126,16 @@ public class ClientController
         }
     }
 
-    @PostMapping(path = "/shoppingcart")
-    public ResponseEntity<?> createShoppingCart(@RequestParam(value = "clientId") String clientId,
+    @PutMapping(path = "/shoppingcart")
+    public ResponseEntity<ShoppingCart> createShoppingCart(@RequestParam(value = "clientId") String clientId,
                                                            @Valid @RequestBody ShoppingCart shoppingCart)
     {
         Optional<Client> client = clientMongoRepository.findById(clientId);
-        //client.ifPresent(client1 -> client1.setShoppingCart(shoppingCart));
         if (client.isPresent()) {
             client.get().setShoppingCart(shoppingCart);
             clientMongoRepository.save(client.get());
-            return new ResponseEntity<ShoppingCart>(shoppingCart, HttpStatus.OK);
+            return new ResponseEntity<>(shoppingCart, HttpStatus.OK);
         }
-        return new ResponseEntity<>("There isn't any client with this name in the database.",
-                HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }
