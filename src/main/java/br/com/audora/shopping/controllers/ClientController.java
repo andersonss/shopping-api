@@ -1,5 +1,6 @@
 package br.com.audora.shopping.controllers;
 
+import br.com.audora.shopping.mongodb.models.ShoppingCart;
 import com.mongodb.MongoClient;
 import com.mongodb.client.result.UpdateResult;
 
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
@@ -123,6 +125,20 @@ public class ClientController
         {
             return new ResponseEntity<>("This client doesn't exists in the database.", HttpStatus.NOT_FOUND);
         }
+    }
 
+    @PostMapping(path = "/shoppingcart")
+    public ResponseEntity<?> createShoppingCart(@RequestParam(value = "clientId") String clientId,
+                                                           @Valid @RequestBody ShoppingCart shoppingCart)
+    {
+        Optional<Client> client = clientMongoRepository.findById(clientId);
+        //client.ifPresent(client1 -> client1.setShoppingCart(shoppingCart));
+        if (client.isPresent()) {
+            client.get().setShoppingCart(shoppingCart);
+            clientMongoRepository.save(client.get());
+            return new ResponseEntity<ShoppingCart>(shoppingCart, HttpStatus.OK);
+        }
+        return new ResponseEntity<>("There isn't any client with this name in the database.",
+                HttpStatus.NOT_FOUND);
     }
 }

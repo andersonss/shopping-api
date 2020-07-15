@@ -13,6 +13,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,6 +32,14 @@ public class ClientServiceTest {
 
     @Autowired
     private ClientRepository clientMongoRepository;
+
+    @Test
+    public void shouldGetClientsByFirstName() {
+        Profile profile = new Profile("Billy", "Sandey", Gender.Male);
+        Client createdClient = clientMongoRepository.save(new Client(profile));
+        Client client = restTemplate.getForObject(rootUrl + this.port + "/client?firstName=Billy", Client.class);
+        assertThat(createdClient.getProfile().getFirstName()).isEqualTo(client.getProfile().getFirstName());
+    }
 
     @Test
     public void shouldCreateClient() {
