@@ -8,6 +8,8 @@ import java.util.List;
 
 public class ShoppingCart {
 
+    private String clientId;
+
     private List<Product> orderProducts;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -88,5 +90,13 @@ public class ShoppingCart {
 
     public void setFinalPrice(float finalPrice) {
         this.finalPrice = finalPrice;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 }

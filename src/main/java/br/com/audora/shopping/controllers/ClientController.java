@@ -126,11 +126,10 @@ public class ClientController
         }
     }
 
-    @PutMapping(path = "/shoppingcart")
-    public ResponseEntity<ShoppingCart> createShoppingCart(@RequestParam(value = "clientId") String clientId,
-                                                           @Valid @RequestBody ShoppingCart shoppingCart)
+    @PostMapping(path = "/shoppingcart")
+    public ResponseEntity<ShoppingCart> createShoppingCart(@Valid @RequestBody ShoppingCart shoppingCart)
     {
-        Optional<Client> client = clientMongoRepository.findById(clientId);
+        Optional<Client> client = clientMongoRepository.findById(shoppingCart.getClientId());
         if (client.isPresent()) {
             client.get().setShoppingCart(shoppingCart);
             clientMongoRepository.save(client.get());

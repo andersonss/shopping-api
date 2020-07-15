@@ -177,12 +177,15 @@ public class ClientServiceTest {
         shoppingCart.addOrderProduct(desk);
         shoppingCart.addOrderProduct(spoon);
         shoppingCart.addOrderProduct(diningChair);
+        shoppingCart.setClientId(createdClient.getId());
 
         HttpEntity<ShoppingCart> request = new HttpEntity<>(shoppingCart);
-        ResponseEntity<ShoppingCart> response = restTemplate.getForEntity(rootUrl + this.port +
-                "/client/shoppingcart?clientId=" + createdClient.getId(), ShoppingCart.class);
+        ResponseEntity<ShoppingCart> response = restTemplate.postForEntity(rootUrl + this.port +
+                "/client/shoppingcart", request, ShoppingCart.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertThat(clientMongoRepository.findById(createdClient.getId()).get().getShoppingCart().getNumberOfProducts())
+                .isEqualTo(3);
     }
 }
 

@@ -51,6 +51,7 @@ public class Client
 
     public void setShoppingCart(ShoppingCart shoppingCart) {
         this.shoppingCart = shoppingCart;
+        this.shoppingCart.setClientId(id);
     }
 
     @Override
