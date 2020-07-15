@@ -37,21 +37,22 @@ public class ClientController
     private ClientRepository clientMongoRepository;
 
     /**
-     * Get a client by first name
+     * Get clients by first name
      * @param firstName
      * @return
      */
     @GetMapping(path = "")
-    public ResponseEntity<?> getClientsByName(@RequestParam(value = "firstName") String firstName)
+    public ResponseEntity<?> getClientsByFirstName(@RequestParam(value = "firstName") String firstName)
     {
         List<Client> clients = clientMongoRepository.findByFirstName(firstName);
         if (clients.size() > 0)
         {
-            System.out.println("There are " + clients.size() + " sellers with first name " + firstName +
-                    " in MongoDB database.");
+            System.out.println("There are " + clients.size() + " clients with first name " + firstName +
+                    " in the database.");
             return new ResponseEntity<>(clients, HttpStatus.OK);
         }
-        return new ResponseEntity<>("There isn't any seller with this name in MongoDB.", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("There isn't any client with this name in the database.",
+                HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -72,13 +73,13 @@ public class ClientController
      * @return
      */
     @PostMapping(path = "")
-    public ResponseEntity<Client> addNewClient(@Valid @RequestBody Client client)
+    public ResponseEntity<Client> createClient(@Valid @RequestBody Client client)
     {
         Profile profile = new Profile(client.getProfile().getFirstName(), client.getProfile().getLastName(),
                 client.getProfile().getGender());
-        Client clientMongoDB = new Client(profile);
-        clientMongoDB = clientMongoRepository.save(clientMongoDB);
-        return new ResponseEntity<>(clientMongoDB, HttpStatus.OK);
+        Client newClient = new Client(profile);
+        newClient = clientMongoRepository.save(newClient);
+        return new ResponseEntity<>(newClient, HttpStatus.OK);
     }
 
     /**
@@ -88,11 +89,12 @@ public class ClientController
      * @return
      */
     @PutMapping(path = "")
-    public ResponseEntity<String> updateClientInMongoDB(@Valid @RequestBody Client client)
+    public ResponseEntity<String> updateClient(@Valid @RequestBody Client client)
     {
         try
         {
-            Client clientInDatabase = clientMongoRepository.findById(client.getId()).orElseThrow(EntityNotFoundException::new);
+            Client clientInDatabase = clientMongoRepository.findById(client.getId())
+                    .orElseThrow(EntityNotFoundException::new);
             Update update = new Update();
             update.set("profile.firstName", client.getProfile().getFirstName());
             update.set("profile.lastName", client.getProfile().getLastName());
@@ -106,10 +108,11 @@ public class ClientController
             UpdateResult updateResult = mongoOperation.updateFirst(query, update, Client.class);
             if (updateResult.getModifiedCount() == 1)
             {
-                clientInDatabase = clientMongoRepository.findById(client.getId()).orElseThrow(EntityNotFoundException::new);
+                clientInDatabase = clientMongoRepository.findById(client.getId())
+                        .orElseThrow(EntityNotFoundException::new);
                 System.out.println("__________________________________________________________________");
                 System.out.println("The document of " + clientInDatabase.toString() + " updated");
-                return new ResponseEntity<>("The seller updated", HttpStatus.OK);
+                return new ResponseEntity<>("Client updated", HttpStatus.OK);
             }
             else
             {
@@ -118,7 +121,7 @@ public class ClientController
         }
         catch (EntityNotFoundException e)
         {
-            return new ResponseEntity<>("This seller doesn't exists in MongoDB.", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("This client doesn't exists in the database.", HttpStatus.NOT_FOUND);
         }
 
     }
