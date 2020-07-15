@@ -1,5 +1,6 @@
 package br.com.audora.shopping;
 
+import br.com.audora.shopping.mongodb.models.*;
 import com.mongodb.MongoClient;
 import com.mongodb.client.result.UpdateResult;
 
@@ -20,11 +21,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import br.com.audora.shopping.enums.Gender;
-import br.com.audora.shopping.mongodb.models.Category;
-import br.com.audora.shopping.mongodb.models.EmbeddedCategory;
-import br.com.audora.shopping.mongodb.models.Product;
-import br.com.audora.shopping.mongodb.models.Profile;
-import br.com.audora.shopping.mongodb.models.Client;
 import br.com.audora.shopping.mongodb.repositories.CategoryRepository;
 import br.com.audora.shopping.mongodb.repositories.ProductRepository;
 import br.com.audora.shopping.mongodb.repositories.ClientRepository;
@@ -54,7 +50,7 @@ public class Application implements CommandLineRunner
         productMongoRepository.deleteAll();
 
         //--------------Create a client-----------------------------------------------
-        Profile profile = new Profile("Anderson", "Silva", Gender.Male);
+        Profile profile = new Profile("Billy", "Sandey", Gender.Male);
         Client client = new Client(profile);
         clientMongoRepository.save(client);
 
@@ -65,7 +61,7 @@ public class Application implements CommandLineRunner
         System.out.println("__________________________________________________________________");
 
 
-        //--------------Create four different categories in MongoDB-------------------
+        // Create four different categories in MongoDB
         Category furnitureCategory = new Category("Furniture");
         Category handmadeCategory = new Category("Handmade");
         furnitureCategory = categoryMongoRepository.save(furnitureCategory);
@@ -77,11 +73,15 @@ public class Application implements CommandLineRunner
         woodCategory = categoryMongoRepository.save(woodCategory);
 
 
-        //--------------Create a product in two different categories------------------
+        // Create a product in two different categories
         EmbeddedCategory woodEmbedded = new EmbeddedCategory(woodCategory.getId(), woodCategory.getName());
         EmbeddedCategory handmadeEmbedded = new EmbeddedCategory(handmadeCategory.getId(), handmadeCategory.getName());
+
         HashSet<EmbeddedCategory> categoryList = new HashSet<>(Arrays.asList(woodEmbedded, handmadeEmbedded));
-        Product desk = new Product("A Wooden Desk", "Made with thick solid reclaimed wood, Easy to Assemble", 249.99f, categoryList);
+
+        // The product
+        Product desk = new Product("A Wooden Desk", "Made with thick solid reclaimed wood, Easy to " +
+                "Assemble", 499.99f, categoryList);
         desk = productMongoRepository.save(desk);
 
         Update update = new Update();
@@ -95,9 +95,11 @@ public class Application implements CommandLineRunner
                 + String.valueOf(updateResult.getMatchedCount()));
 
 
-        //--------------Create a product in one category------------------------------
+        // Create a product in one category
         EmbeddedCategory furnitureEmbedded = new EmbeddedCategory(furnitureCategory.getId(), furnitureCategory.getName());
         categoryList = new HashSet<>(Arrays.asList(furnitureEmbedded));
+
+        // The product
         Product diningChair = new Product("Antique Dining Chair",
                 "This mid-century fashionable chair is quite comfortable and attractive.", 234.20f,
                 categoryList);
@@ -114,9 +116,11 @@ public class Application implements CommandLineRunner
                 + String.valueOf(updateResult.getMatchedCount()));
 
 
-        //--------------Create a product in three different categories------------------
+        // Create a product in three different categories
         EmbeddedCategory kitchenEmbedded = new EmbeddedCategory(kitchenCategory.getId(), kitchenCategory.getName());
         categoryList = new HashSet<>(Arrays.asList(handmadeEmbedded, woodEmbedded, kitchenEmbedded));
+
+        // The product
         Product spoon = new Product("Bamboo Spoon", "This is more durable than traditional hardwood " +
                 "spoon, safe to use any cookware.", 13.11f, categoryList);
         spoon = productMongoRepository.save(spoon);
@@ -130,5 +134,17 @@ public class Application implements CommandLineRunner
         System.out.println("__________________________________________________________________");
         System.out.println("The count of categories which updated after saving wooden spoon is:  "
                 + String.valueOf(updateResult.getMatchedCount()));
+
+        // Create a shopping cart
+        System.out.println("__________________________________________________________________");
+        System.out.println("Adding shopping cart to client:  ");
+        ShoppingCart shoppingCart = new ShoppingCart();
+        shoppingCart.addOrderProduct(desk);
+        shoppingCart.addOrderProduct(spoon);
+        shoppingCart.addOrderProduct(diningChair);
+
+        client.setShoppingCart(shoppingCart);
+
+        clientMongoRepository.save(client);
     }
 }

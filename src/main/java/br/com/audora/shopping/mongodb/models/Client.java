@@ -14,6 +14,8 @@ public class Client
 
     private Profile profile;
 
+    private ShoppingCart shoppingCart;
+
     public Client()
     {
     }
@@ -41,6 +43,14 @@ public class Client
     public void setProfile(Profile profile)
     {
         this.profile = profile;
+    }
+
+    public ShoppingCart getShoppingCart() {
+        return shoppingCart;
+    }
+
+    public void setShoppingCart(ShoppingCart shoppingCart) {
+        this.shoppingCart = shoppingCart;
     }
 
     @Override
