@@ -23,6 +23,8 @@ public class Product
 
     private float price;
 
+    private float discountPercentage;
+
     private List<String> image_URLs;
 
     /*
@@ -104,6 +106,14 @@ public class Product
     public void setFallIntoCategories(HashSet<EmbeddedCategory> fallIntoCategories)
     {
         this.fallIntoCategories = fallIntoCategories;
+    }
+
+    public float getDiscountPercentage() {
+        return discountPercentage;
+    }
+
+    public void setDiscountPercentage(float discountPercentage) {
+        this.discountPercentage = discountPercentage;
     }
 }
 

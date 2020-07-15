@@ -137,8 +137,12 @@ public class Application implements CommandLineRunner
 
         // Create a shopping cart
         System.out.println("__________________________________________________________________");
-        System.out.println("Adding shopping cart to client:  ");
+        System.out.println("Adding shopping cart to client... ");
         ShoppingCart shoppingCart = new ShoppingCart();
+
+        // Adding discount to the product
+        desk.setDiscountPercentage(15);
+
         shoppingCart.addOrderProduct(desk);
         shoppingCart.addOrderProduct(spoon);
         shoppingCart.addOrderProduct(diningChair);

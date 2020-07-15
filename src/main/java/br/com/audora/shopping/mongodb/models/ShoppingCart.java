@@ -1,6 +1,5 @@
 package br.com.audora.shopping.mongodb.models;
 
-import org.springframework.data.annotation.Id;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.ArrayList;
@@ -16,17 +15,29 @@ public class ShoppingCart {
 
     private float totalPrice;
 
+    private float totalDiscount;
+
+    private float finalPrice;
+
     public ShoppingCart() {
         orderProducts = new ArrayList<>();
         dateCreated = new Date();
     }
 
-    public float getTotalPrice() {
+    public void calculatePrice() {
         float totalPrice = 0;
+        float totalDiscount = 0;
         for (Product orderProduct : orderProducts) {
             totalPrice += orderProduct.getPrice();
+            float discountPercentage = orderProduct.getDiscountPercentage();
+            if (discountPercentage > 0) {
+                totalDiscount += orderProduct.getPrice() * (discountPercentage / 100);
+            }
         }
-        return totalPrice;
+        setTotalPrice(totalPrice);
+        setTotalDiscount(totalDiscount);
+        setFinalPrice(totalPrice - totalDiscount);
+
     }
 
     public int getNumberOfProducts() {
@@ -35,7 +46,7 @@ public class ShoppingCart {
 
     public void addOrderProduct(Product orderProduct) {
         orderProducts.add(orderProduct);
-        setTotalPrice(getTotalPrice());
+        calculatePrice();
     }
 
     public List<Product> getOrderProducts() {
@@ -44,7 +55,7 @@ public class ShoppingCart {
 
     public void setOrderProducts(List<Product> orderProducts) {
         this.orderProducts = orderProducts;
-        setTotalPrice(getTotalPrice());
+        calculatePrice();
     }
 
     public Date getDateCreated() {
@@ -55,7 +66,27 @@ public class ShoppingCart {
         this.dateCreated = dateCreated;
     }
 
+    public float getTotalPrice() {
+        return totalPrice;
+    }
+
+    public float getTotalDiscount() {
+        return totalDiscount;
+    }
+
     public void setTotalPrice(float totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public void setTotalDiscount(float totalDiscount) {
+        this.totalDiscount = totalDiscount;
+    }
+
+    public float getFinalPrice() {
+        return finalPrice;
+    }
+
+    public void setFinalPrice(float finalPrice) {
+        this.finalPrice = finalPrice;
     }
 }
